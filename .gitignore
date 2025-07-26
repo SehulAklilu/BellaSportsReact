@@ -45,3 +45,4 @@ next-env.d.ts
 # Custom Ignores
 # Ignore the folder containing the Firestore upload script and service account key
 /upload_data
+upload_data/service-account.json
