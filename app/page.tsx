@@ -224,10 +224,10 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative text-center overflow-hidden py-20 sm:py-24">
            <div 
-          className="hero-background absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
+          className="hero-background absolute inset-0 bg-cover bg-center bg-no-repeat"
           ></div>
-          <div className="absolute inset-0 bg-black/60 -z-10"></div>
-            <div className="container">
+          <div className="absolute inset-0 bg-black/60"></div>
+            <div className="relative z-10 container">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter text-white">
               ለእርስዎ ተወዳጅ የስፖርት ተጽእኖ ፈጣሪ ድምጽ ይስጡ
             </h1>
