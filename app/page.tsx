@@ -224,8 +224,7 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative text-center overflow-hidden py-20 sm:py-24">
            <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
-          style={{ backgroundImage: "url('/images/hero-background.jpg')" }}
+          className="hero-background absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
           ></div>
           <div className="absolute inset-0 bg-black/60 -z-10"></div>
             <div className="container">

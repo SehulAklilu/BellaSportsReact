@@ -167,3 +167,7 @@
   background-color: #BAE6FD;
   color: hsl(var(--accent-foreground));
 }
+
+.hero-background {
+  background-image: url('/images/hero-background.jpg');
+}
