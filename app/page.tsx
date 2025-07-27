@@ -222,7 +222,7 @@ export default function Home() {
 
       <main>
         {/* Hero Section */}
-        <section className="relative text-center overflow-hidden py-20 sm:py-24">
+        <section className="relative text-center overflow-hidden py-30 sm:py-36">
            <div 
           className="hero-background absolute inset-0 bg-cover bg-center bg-no-repeat"
           ></div>
