@@ -60,6 +60,17 @@ const votingSteps = [
   }
 ];
 
+const heroTextSets = [
+  {
+    heading: "ለእርስዎ ተወዳጅ የስፖርት ተጽእኖ ፈጣሪ ድምጽ ይስጡ",
+    paragraph: "Your vote matters! Help us crown the best in sports content creation."
+  },
+  {
+    heading: "Your vote matters! Help us crown the best in sports content creation.",
+    paragraph: "ለእርስዎ ተወዳጅ የስፖርት ተጽእኖ ፈጣሪ ድምጽ ይስጡ"
+  }
+];
+
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -86,6 +97,25 @@ export default function Home() {
   const [votedCategories, setVotedCategories] = useState<Record<string, boolean>>({});
   const [isVotingActive, setIsVotingActive] = useState(true);
 
+  const [textIndex, setTextIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsFading(true); // Start fading out
+
+      // Wait for the fade-out animation to finish before changing the text
+      setTimeout(() => {
+        setTextIndex((prevIndex) => (prevIndex + 1) % heroTextSets.length);
+        setIsFading(false); // Start fading back in
+      }, 500); // This duration should match your CSS transition duration
+
+    }, 5000); // 10 seconds
+
+    // Cleanup the timer when the component unmounts to prevent memory leaks
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     // Check the date on component mount and set an interval to re-check
     const checkVotingStatus = () => {
@@ -99,6 +129,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    setIsClient(true);
     if (typeof window !== 'undefined') {
       const storedVotes = localStorage.getItem('votedCategories');
       if (storedVotes) {
@@ -228,12 +259,14 @@ export default function Home() {
           ></div>
           <div className="absolute inset-0 bg-black/60"></div>
             <div className="relative z-10 container">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter text-white">
-              ለእርስዎ ተወዳጅ የስፖርት ተጽእኖ ፈጣሪ ድምጽ ይስጡ
-            </h1>
-            <p className="max-w-2xl mx-auto mt-4 text-md text-slate-200">
-              Your vote matters! Help us crown the best in sports content creation.
-            </p>
+            <div className={`transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter text-white">
+                {heroTextSets[textIndex].heading}
+              </h1>
+              <p className="max-w-2xl mx-auto mt-4 text-md text-slate-200">
+                {heroTextSets[textIndex].paragraph}
+              </p>
+            </div>
             {isVotingActive ? (
                 // If voting is active, show the timer
                 <CountdownTimer />
@@ -245,8 +278,8 @@ export default function Home() {
                   </p>
                   <div className="max-w-md mx-auto bg-black/30 backdrop-blur-sm p-6 rounded-lg text-slate-100">
                     <div className="flex flex-col items-center gap-2 text-lg">
-                      <span>ሃያሁለት ከአዲሱ ፖሊስ ጣብያ ገባ ብሎ</span>
-                      <span>ቦሌ ትምህርት ቤት ፊትለፊት ሽልም ታወር ላይ</span>
+                      <span>ሃያሁለት የድሮ ጤና ጣብያ ወደ ኩኩሉ ቺክን በሚወስደው መንገድ</span>
+                      <span>ቦሌ ትምህርት ቤት ፊትለፊት ሽልም ታወር 1ኛ ፎቅ ላይ</span>
                       <span>ጋዜቦ አደባባይ ከሰንዓ ሬስቶራንት ፊትለፊት</span>
                     </div>
                   </div>
@@ -400,10 +433,12 @@ export default function Home() {
       
       <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 px-20">
          <div className="container">
+          
           {/* Top Section: Two-Column Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 py-16">
-            
             {/* Column 1: Bella Sports & Socials */}
+            <div>
+              <h3 className="text-xl font-bold text-white mb-4">Our Social Links</h3>
             <div className="flex items-center gap-4 mt-6">
               {/* Telegram Link */}
               <a href="https://t.me/bellasportswear" target="_blank" rel="noopener noreferrer" aria-label="Telegram" className="text-muted-foreground hover:text-white transition-colors">
@@ -420,18 +455,23 @@ export default function Home() {
                 <TikTokIcon className="h-6 w-6" />
               </a>
           </div>
+          </div>
 
             {/* Column 2: Contact Us */}
             <div>
               <h3 className="text-xl font-bold text-white mb-4">Contact Us</h3>
               <ul className="space-y-4">
-                <li className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-sky-400 shrink-0" />
-                  <div className='flex flex-col'>
-                    <span>ሃያሁለት ከአዲሱ ፖሊስ ጣብያ ገባ ብሎ</span>
-                    <span>ቦሌ ትምህርት ቤት ፊትለፊት ሽልም ታወር ላይ</span>
-                    <span>ጋዜቦ አደባባይ ከሰንዓ ሬስቶራንት ፊትለፊት</span>
-                  </div>
+                 <li className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-sky-400 shrink-0 mt-1" />
+                  <span>ሃያሁለት የድሮ ጤና ጣብያ ወደ ኩኩሉ ቺክን በሚወስደው መንገድ</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-sky-400 shrink-0 mt-1" />
+                  <span>ቦሌ ትምህርት ቤት ፊትለፊት ሽልም ታወር 1ኛ ፎቅ ላይ</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-sky-400 shrink-0 mt-1" />
+                  <span>ጋዜቦ አደባባይ ከሰንዓ ሬስቶራንት ፊትለፊት</span>
                 </li>
                 {/* <li className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-sky-400 shrink-0" />
@@ -439,6 +479,7 @@ export default function Home() {
                     contact@bellasports.com
                   </a>
                 </li> */}
+                <div className="flex items-center gap-3"></div>
                 <li className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-sky-400 shrink-0" />
                   <div className='flex flex-col'>
