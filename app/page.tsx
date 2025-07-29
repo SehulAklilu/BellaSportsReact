@@ -286,6 +286,11 @@ export default function Home() {
                   </div>
                 </div>
               )}
+              <div className={`transition-opacity duration-500 ease-in-out`}>
+              <h1 className="py-8 text-xl sm:text-2xl md:text-3xl font-bold tracking-tighter text-white">
+                Awarded on August 17, 2025 in Bellevue Hotel And Spa, Megenagna.
+              </h1>
+              </div>
           </div>
 
         </section>
