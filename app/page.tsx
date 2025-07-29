@@ -246,9 +246,9 @@ export default function Home() {
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container h-14 flex items-center">
+        <div className="container h-22 flex items-center justify-center">
           {/* Replace with your actual logo if needed */}
-          <img src="/images/logo.png" alt="Bella Sports Logo" className="h-8" />
+          <img src="/images/logo.png" alt="Bella Sports Logo" className="h-10" />
         </div>
       </header>
 
