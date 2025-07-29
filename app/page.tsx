@@ -29,6 +29,7 @@ interface Category {
     title: string;
     order: number;
     description: string; 
+    iconUrl: string;
 }
 
  
@@ -310,6 +311,13 @@ export default function Home() {
                 return (
                   <AccordionItem key={category.id} value={category.id} className="border-none">
                     <AccordionTrigger className="p-4 sm:p-6 bg-sky-100 text-sky-900 rounded-lg shadow-sm transition-colors hover:bg-sky-200 data-[state=open]:rounded-b-none">
+                      {category.iconUrl && (
+                        <img 
+                          src={category.iconUrl} 
+                          alt={`${category.title} icon`}
+                          className="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white/20"
+                        />
+                      )}
                       <div className="flex-1 text-left">
                         <h3 className="text-lg font-semibold">{category.title}</h3>
                         <p className="text-sm text-sky-800/80 mt-1">{category.description}</p>
