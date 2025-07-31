@@ -10,6 +10,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Progress } from "@/components/ui/progress";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { SuggestionForm } from '@/components/custom/suggestion-form';
+import { Toaster } from "@/components/ui/sonner";
 import { Twitter, Instagram, Facebook, Send, MessageCircle, LayoutGrid, MousePointerClick, Vote, Tv, MapPin, Phone, ChevronDown } from 'lucide-react';
 
 // Custom Components
@@ -296,7 +298,7 @@ export default function Home() {
         </section>
 
         {/* Voting Grid Section */}
-        <section className="container py-20">
+        {/* <section className="container py-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Creator Nominees</h2>
             <p className="max-w-xl mx-auto mt-2 text-muted-foreground">
@@ -363,7 +365,23 @@ export default function Home() {
               })}
             </Accordion>
           )}
+        </section> */}
+        <section className="container py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Nomination Phase</h2>
+            <p className="max-w-xl mx-auto mt-2 text-muted-foreground">
+              Official voting has not yet begun. Use the form below to suggest creators you&apos;d like to see nominated.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="text-center text-muted-foreground">Loading Categories...</div>
+          ) : (
+            <SuggestionForm categories={categories} />
+          )}
         </section>
+
+
          <section className="container px-12 bg-gray-200 py-20 sm:py-24">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
