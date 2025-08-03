@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, onSnapshot, doc, runTransaction, query, orderBy, getDoc } from 'firebase/firestore';
+import { collection, getDocs, onSnapshot, doc, runTransaction, query, orderBy, getDoc, Unsubscribe } from 'firebase/firestore';
 
 // Shadcn UI Components
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { SuggestionForm } from '@/components/custom/suggestion-form';
 import { Toaster } from "@/components/ui/sonner";
 import { Twitter, Instagram, Facebook, Send, MessageCircle, LayoutGrid, MousePointerClick, Vote, Tv, MapPin, Phone, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 
 // Custom Components
 import { CountdownTimer } from '@/components/custom/countdown-timer';
@@ -120,25 +121,69 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Check the date on component mount and set an interval to re-check
-    const checkVotingStatus = () => {
-      setIsVotingActive(new Date() < VOTING_END_DATE);
+    // Set client-side flags
+    setIsClient(true);
+    const storedVotes = localStorage.getItem('votedCategories');
+    if (storedVotes) setVotedCategories(JSON.parse(storedVotes));
+
+    // Set up voting status checker
+    const checkVotingStatus = () => setIsVotingActive(new Date() < VOTING_END_DATE);
+    checkVotingStatus();
+    const votingInterval = setInterval(checkVotingStatus, 1000);
+
+    // --- Data fetching logic using async/await for clarity and type safety ---
+    const fetchAndSubscribe = async () => {
+      // 1. Determine if live updates should be enabled for this user
+      let LIVE_UPDATES_ENABLED = false;
+      try {
+        const now = new Date().getTime();
+        const threeDaysInMillis = 3 * 24 * 60 * 60 * 1000;
+        const lastLiveSessionTimestamp = localStorage.getItem('lastLiveSession');
+        if (!lastLiveSessionTimestamp || (now - parseInt(lastLiveSessionTimestamp)) > threeDaysInMillis) {
+          LIVE_UPDATES_ENABLED = true;
+          localStorage.setItem('lastLiveSession', now.toString());
+        }
+      } catch (error) {
+        console.error("Could not access localStorage; disabling live updates.", error);
+      }
+
+      // 2. Fetch all categories
+      const categoriesQuery = query(collection(db, "categories"), orderBy("order", "asc"));
+      const categoriesSnapshot = await getDocs(categoriesQuery);
+      const fetchedCategories: Category[] = categoriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
+      setCategories(fetchedCategories);
+      setLoading(false);
+
+      // 3. Set up listeners (or one-time fetch) for nominees in each category
+      const unsubscribes: Unsubscribe[] = [];
+      fetchedCategories.forEach((category: Category) => {
+        const nomineesQuery = query(collection(db, "categories", category.id, "nominees"), orderBy("votes", "desc"));
+        if (LIVE_UPDATES_ENABLED) {
+          const unsubscribe = onSnapshot(nomineesQuery, (snapshot) => {
+            const newNominees: Nominee[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Nominee));
+            const newTotalVotes = newNominees.reduce((sum, nom) => sum + nom.votes, 0);
+            setNomineesByCategoryId(prev => ({ ...prev, [category.id]: newNominees }));
+            setTotalVotesByCategoryId(prev => ({ ...prev, [category.id]: newTotalVotes }));
+          });
+          unsubscribes.push(unsubscribe);
+        } else {
+          getDocs(nomineesQuery).then(snapshot => {
+            const newNominees: Nominee[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Nominee));
+            const newTotalVotes = newNominees.reduce((sum, nom) => sum + nom.votes, 0);
+            setNomineesByCategoryId(prev => ({ ...prev, [category.id]: newNominees }));
+            setTotalVotesByCategoryId(prev => ({ ...prev, [category.id]: newTotalVotes }));
+          });
+        }
+      });
+      
+      // 4. Return a master cleanup function
+      return () => {
+        clearInterval(votingInterval);
+        unsubscribes.forEach((unsub: Unsubscribe) => unsub());
+      };
     };
 
-    checkVotingStatus(); // Check immediately
-    const interval = setInterval(checkVotingStatus, 1000); // Re-check every second
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
-
-  useEffect(() => {
-    setIsClient(true);
-    if (typeof window !== 'undefined') {
-      const storedVotes = localStorage.getItem('votedCategories');
-      if (storedVotes) {
-        setVotedCategories(JSON.parse(storedVotes));
-      }
-    }
+    fetchAndSubscribe();
   }, []);
 
   const shareText = "Vote for your favorite creator in the Bella Sports Awards!";
@@ -175,42 +220,7 @@ export default function Home() {
 
 
   // --- UPDATED DATA FETCHING LOGIC ---
-  useEffect(() => {
-    // 1. Fetch all categories once
-    const fetchCategories = async () => {
-      const categoriesQuery = query(collection(db, "categories"), orderBy("order", "asc"));
-      const querySnapshot = await getDocs(categoriesQuery);
-      const fetchedCategories: Category[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
-      setCategories(fetchedCategories);
-      setLoading(false);
-      return fetchedCategories;
-    };
-
-    // 2. After fetching categories, set up listeners for each category's nominees
-    fetchCategories().then(fetchedCategories => {
-      const unsubscribes = fetchedCategories.map(category => {
-        const nomineesQuery = query(
-          collection(db, "categories", category.id, "nominees"),
-          orderBy("votes", "desc")
-        );
-        
-        // Return the unsubscribe function for each listener
-        return onSnapshot(nomineesQuery, (snapshot) => {
-          const newNominees: Nominee[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Nominee));
-          const newTotalVotes = newNominees.reduce((sum, nom) => sum + nom.votes, 0);
-
-          // Update the state object at the specific category's key
-          setNomineesByCategoryId(prev => ({ ...prev, [category.id]: newNominees }));
-          setTotalVotesByCategoryId(prev => ({ ...prev, [category.id]: newTotalVotes }));
-        });
-      });
-
-      // 3. Return a cleanup function that unsubscribes from all listeners
-      return () => {
-        unsubscribes.forEach(unsub => unsub());
-      };
-    }).catch(console.error);
-  }, []);
+ 
 
   const handleVote = async (nomineeId: string, categoryId: string | null) => {
     if (!isVotingActive) {
@@ -249,8 +259,7 @@ export default function Home() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container h-22 flex items-center justify-center">
-          {/* Replace with your actual logo if needed */}
-          <img src="/images/logo.png" alt="Bella Sports Logo" className="h-10" />
+          <Image src="/images/logo.png" alt="Bella Sports Logo" width={180} height={42} priority  />
         </div>
       </header>
 
