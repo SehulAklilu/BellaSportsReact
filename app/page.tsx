@@ -349,7 +349,17 @@ export default function Home() {
                             const percentage = totalVotes > 0 ? (nominee.votes / totalVotes) * 100 : 0;
                             return (
                               <Card key={nominee.id} className="transition-all hover:shadow-lg">
-                                <CardHeader className="p-0"><img src={nominee.imageUrl} alt={nominee.name} className="aspect-video w-full object-cover rounded-t-lg" /></CardHeader>
+                                <CardHeader className="p-0">
+                                  <Image
+                                    src={nominee.imageUrl}
+                                    alt={nominee.name}
+                                    width={500}  // Base width for aspect ratio and quality
+                                    height={281} // Base height (for a 16:9 aspect ratio)
+                                    className="aspect-video w-full h-auto object-cover rounded-t-lg"
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    priority={false} // Set to false for lazy loading
+                                  />
+                                </CardHeader>
                                 <CardContent className="pt-6">
                                   <CardTitle className="text-xl">{nominee.name}</CardTitle>
                                   <div className="flex items-center gap-4 mt-4">
