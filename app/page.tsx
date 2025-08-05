@@ -307,7 +307,7 @@ export default function Home() {
         </section>
 
         {/* Voting Grid Section */}
-        {/* <section className="container py-20">
+        <section className="container py-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Creator Nominees</h2>
             <p className="max-w-xl mx-auto mt-2 text-muted-foreground">
@@ -374,8 +374,8 @@ export default function Home() {
               })}
             </Accordion>
           )}
-        </section> */}
-        <section className="container py-20">
+        </section>
+        {/* <section className="container py-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Nomination Phase</h2>
             <p className="max-w-xl mx-auto mt-2 text-muted-foreground">
@@ -388,7 +388,7 @@ export default function Home() {
           ) : (
             <SuggestionForm categories={categories} />
           )}
-        </section>
+        </section> */}
 
 
          <section className="container px-12 bg-gray-200 py-20 sm:py-24">
