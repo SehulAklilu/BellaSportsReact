@@ -554,7 +554,8 @@ export default function Home() {
             © {new Date().getFullYear()} Bella Sports. All Rights Reserved.
           </div>
           <div className="text-center py-8 text-sm text-muted-foreground">
-            Developed by <a href="mailto:sehulaklilu@gmail.com" className="hover:text-white transition-colors">Sehulaklilu</a>
+            Developed by <a href="mailto:sehulaklilu@gmail.com" className="hover:text-white transition-colors">Sehulaklilu</a>.
+            <a href="https://t.me/SehulAk" target="_blank" rel="noopener noreferrer" aria-label="Telegram" className="text-muted-foreground hover:text-white transition-colors justify-center"> Find me Here </a>
           </div>
         </div>
       </footer>
