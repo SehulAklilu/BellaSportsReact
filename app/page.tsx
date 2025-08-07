@@ -251,7 +251,14 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Voting error:', error);
-      alert(`An error occurred while voting. Please try again.`);
+      // This checks if the error is a standard Error object with a .message property
+      if (error instanceof Error) {
+        // If it is, display the specific message from the server!
+        alert(error.message); 
+      } else {
+        // As a fallback for any other kind of unexpected error
+        alert("An unexpected error occurred. Please try again.");
+      }
     }
   };
 

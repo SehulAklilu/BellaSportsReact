@@ -22,6 +22,7 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
+const ALREADY_VOTED_MESSAGE = "This IP address has already voted in this category. If you are using the same WiFi network as another voter, please change WiFi or use mobile data.";
 // --- NEW: Export a named function for the HTTP method (POST) ---
 export async function POST(req) {
   if (new Date() > VOTING_END_DATE) {
@@ -54,7 +55,7 @@ export async function POST(req) {
       const ipVoteDoc = await transaction.get(ipVoteRef);
       if (ipVoteDoc.exists) {
         // If the document exists, this IP has already voted. Block the vote.
-        throw new Error('This IP address has already voted in this category.');
+        throw new Error(ALREADY_VOTED_MESSAGE);
       }
 
 
@@ -79,7 +80,7 @@ export async function POST(req) {
     return NextResponse.json({ success: true, message: 'Vote counted!' });
   } catch (error) {
    // Check for our specific error message
-    if (error.message === 'This IP address has already voted in this category.') {
+    if (error.message === ALREADY_VOTED_MESSAGE) {
       // Send a specific, user-friendly error message
       return NextResponse.json({ success: false, message: error.message }, { status: 429 }); // 429 Too Many Requests
     }
